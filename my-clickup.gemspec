@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require_relative "lib/my/clickup/version"
+require_relative "lib/my_clickup/version"
 
 Gem::Specification.new do |spec|
   spec.name = "my-clickup"
-  spec.version = My::Clickup::VERSION
+  spec.version = MyClickup::VERSION
   spec.authors = ["nasum"]
   spec.email = ["tomato.wonder.life@gmail.com"]
 

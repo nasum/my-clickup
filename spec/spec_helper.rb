@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "my/clickup"
+require "my_clickup"
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
