@@ -20,7 +20,33 @@ class MyClickup::Client
     end
   end
 
-  def get_teams
-    connection.get("team").body
+  def me
+    connection.get("user").body
+  end
+
+  def teams
+    connection.get("team").body["teams"].map do |team|
+      {
+        id: team["id"],
+        name: team["name"],
+        color: team["color"],
+        avatar: team["avatar"]
+      }
+    end
+  end
+
+  def spaces(team_id, archived: false)
+    spaces = connection.get("team/#{team_id}/space", { archived: archived }).body["spaces"]
+    spaces.map do |space|
+      {
+        id: space["id"],
+        name: space["name"],
+        statuses: space["statuses"]
+      }
+    end
+  end
+
+  def my_tasks
+    connection.get("task").body
   end
 end
