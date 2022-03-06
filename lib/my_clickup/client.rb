@@ -31,21 +31,13 @@ class MyClickup::Client
     puts "Store your Clickup information"
 
     puts "get my info"
-    me_val = me
+    me_val = me force_update: true
 
     puts "get team info"
-    teams_val = teams
+    teams_val = teams force_update: true
 
     puts "get spaces info"
-    spaces_val = teams_val.map do |team|
-      team_id = team[:id]
-      space_val = spaces(team_id)
-
-      {
-        team_id: team_id,
-        space: space_val
-      }
-    end
+    spaces_val = all_spaces force_update: true
 
     clickup_info = File.open(@config.clickup_info, "w")
     clickup_info.write(JSON.pretty_generate({
@@ -57,11 +49,60 @@ class MyClickup::Client
 
   def show
     clickup_info = File.open(@config.clickup_info, "r")
-    puts clickup_info.read
+    JSON.parse(clickup_info.read)
   end
 
-  def me
-    user = connection.get("user").body["user"]
+  def me(force_update: false)
+    if !force_update && File.exist?(@config.clickup_info)
+      show["me"]
+    else
+      user = connection.get("user").body["user"]
+      decorate_user(user)
+    end
+  end
+
+  def teams(force_update: false)
+    if !force_update && File.exist?(@config.clickup_info)
+      show["teams"].map do |team|
+        decorate_team team
+      end
+    else
+      connection.get("team").body["teams"].map do |team|
+        decorate_team team
+      end
+    end
+  end
+
+  def spaces(team_id, force_update: false, archived: false)
+    if !force_update && File.exist?(@config.clickup_info)
+      show["spaces"]
+    else
+      spaces = connection.get("team/#{team_id}/space", { archived: }).body["spaces"]
+      spaces.map do |space|
+        decorate_space space
+      end
+    end
+  end
+
+  def all_spaces(force_update: false)
+    if !force_update && File.exist?(@config.clickup_info)
+      show["spaces"]
+    else
+      all_space_obj = {}
+      teams(force_update:).map do |team|
+        all_space_obj[team[:id]] = spaces(team[:id], force_update:)
+      end
+      all_space_obj
+    end
+  end
+
+  def my_tasks
+    connection.get("task").body
+  end
+
+  private
+
+  def decorate_user(user)
     {
       id: user["id"],
       username: user["username"],
@@ -71,29 +112,20 @@ class MyClickup::Client
     }
   end
 
-  def teams
-    connection.get("team").body["teams"].map do |team|
-      {
-        id: team["id"],
-        name: team["name"],
-        color: team["color"],
-        avatar: team["avatar"]
-      }
-    end
+  def decorate_team(team)
+    {
+      id: team["id"],
+      name: team["name"],
+      color: team["color"],
+      avatar: team["avatar"]
+    }
   end
 
-  def spaces(team_id, archived: false)
-    spaces = connection.get("team/#{team_id}/space", { archived: archived }).body["spaces"]
-    spaces.map do |space|
-      {
-        id: space["id"],
-        name: space["name"],
-        statuses: space["statuses"]
-      }
-    end
-  end
-
-  def my_tasks
-    connection.get("task").body
+  def decorate_space(space)
+    {
+      id: space["id"],
+      name: space["name"],
+      statuses: space["statuses"]
+    }
   end
 end

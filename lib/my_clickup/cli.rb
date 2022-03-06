@@ -16,12 +16,21 @@ class MyClickup::Cli < Thor
 
   desc "show", "show my clickup information"
   def show
-    @client.show
+    puts JSON.pretty_generate @client.show
   end
 
-  desc "team", "list all teams"
+  desc "me", "get my info"
+  def me
+    puts JSON.pretty_generate @client.me
+  end
 
-  def team
-    @client.teams
+  desc "teams", "list all teams"
+  def teams
+    puts JSON.pretty_generate @client.teams
+  end
+
+  desc "all_spaces", "list all spaces"
+  def all_spaces
+    puts JSON.pretty_generate @client.all_spaces
   end
 end
