@@ -4,9 +4,19 @@ require "thor"
 
 # cli
 class MyClickup::Cli < Thor
+  def initialize(*options)
+    super
+    @client = MyClickup::Client.new
+  end
+
+  desc "init", "Initialize the configuration"
+  def init
+    @client.init
+  end
+
   desc "team", "list all teams"
 
   def team
-    puts MyClickup::Client.new.teams
+    @client.teams
   end
 end
