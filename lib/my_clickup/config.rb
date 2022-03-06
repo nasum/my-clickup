@@ -7,7 +7,14 @@ class MyClickup::Config
   def initialize
     @api_token = ENV["MY_CLICKUP_API_TOKEN"]
     @config_dir = File.expand_path("~/.my_clickup")
-    @config_file = File.join(@config_dir, "config.yml")
+    @config_file = File.join(@config_dir, "config.json")
     @clickup_info = File.join(@config_dir, "clickup_info.json")
+  end
+
+  def default
+    {
+      team: "",
+      space: ""
+    }
   end
 end
