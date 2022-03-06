@@ -14,6 +14,11 @@ class MyClickup::Cli < Thor
     @client.init
   end
 
+  desc "show", "show my clickup information"
+  def show
+    @client.show
+  end
+
   desc "team", "list all teams"
 
   def team
