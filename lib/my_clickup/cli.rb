@@ -9,6 +9,11 @@ class MyClickup::Cli < Thor
     @client = MyClickup::Client.new
   end
 
+  desc "prompt", "start prompt"
+  def prompt
+    MyClickup::Prompt.new(@client).start
+  end
+
   desc "init", "Initialize the configuration"
   def init
     @client.init
