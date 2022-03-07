@@ -14,16 +14,6 @@ class MyClickup::Cli < Thor
     MyClickup::Prompt.new(@client).start
   end
 
-  desc "init", "Initialize the configuration"
-  def init
-    @client.init
-  end
-
-  desc "show", "show my clickup information"
-  def show
-    puts JSON.pretty_generate @client.show
-  end
-
   desc "me", "get my info"
   def me
     puts JSON.pretty_generate @client.me

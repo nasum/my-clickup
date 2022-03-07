@@ -17,21 +17,23 @@ class MyClickup::Prompt
   end
 
   def start
-    while buf = Readline.readline("> ", true)
+    while buf = Readline.readline("#{@context} $ ", true)
       process(buf)
     end
   end
 
   def process(buf)
     case buf
+    when /^context$/
+      puts JSON.pretty_generate @context.to_h
     when /^cd$/
       cd
     when /^cd (.*)$/
       cd(Regexp.last_match(1))
     when /^ls$/
-      ls
+      puts JSON.pretty_generate ls
     when /^ls (.*)$/
-      ls(Regexp.last_match(1))
+      puts JSON.pretty_generate ls(Regexp.last_match(1))
     when /^exit$/
       puts "bye"
       exit
@@ -40,11 +42,25 @@ class MyClickup::Prompt
     end
   end
 
-  def cd(dir = "")
-    puts dir
+  def cd(dir = nil)
+    obj = ls.filter { |item| item[:name] == dir }.first
+    @context.change(obj)
   end
 
-  def ls(dir = "")
-    puts dir
+  def ls(dir = nil)
+    case dir || @context.current
+    when "root"
+      @client.teams
+    when "team"
+      @client.spaces(@context.team[:id])
+    when "space"
+      @client.folders(@context.space[:id])
+    when "folder"
+      @client.lists(@context.folder[:id])
+    when "list"
+      @client.tasks(@context.list[:id])
+    else
+      @client.teams
+    end
   end
 end
