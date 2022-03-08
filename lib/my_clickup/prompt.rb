@@ -35,8 +35,7 @@ class MyClickup::Prompt
     when /^ls (.*)$/
       puts JSON.pretty_generate ls(Regexp.last_match(1))
     when /^exit$/
-      puts "bye"
-      exit
+      do_exit
     else
       puts "unknown command: #{buf}"
     end
@@ -62,5 +61,10 @@ class MyClickup::Prompt
     else
       @client.teams
     end
+  end
+
+  def do_exit
+    puts "bye"
+    exit
   end
 end
