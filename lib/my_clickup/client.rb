@@ -53,15 +53,15 @@ class MyClickup::Client
     all_space_obj
   end
 
-  def folders(space_id:)
+  def folders(space_id)
     connection.get("space/#{space_id}/folder").body
   end
 
-  def lists(space_id:)
+  def lists(space_id)
     connection.get("space/#{space_id}/list").body
   end
 
-  def tasks(list_id:)
+  def tasks(list_id)
     connection.get("list/#{list_id}/task", { assignees: [me["id"].to_i] }).body
   end
 end

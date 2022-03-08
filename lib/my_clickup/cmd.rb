@@ -25,6 +25,7 @@ class MyClickup::Cmd
                @client.spaces(@context.team[:id])
              when "space"
                @client.folders(@context.space[:id])
+               @client.lists(@context.space[:id])
              when "folder"
                @client.lists(@context.folder[:id])
              when "list"
