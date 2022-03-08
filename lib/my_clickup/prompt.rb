@@ -12,8 +12,8 @@ class MyClickup::Prompt
   end
 
   def initialize(client)
-    @client = client
     @context = MyClickup::Context.new
+    @cmd = MyClickup::Cmd.new(client, @context)
   end
 
   def start
@@ -25,46 +25,19 @@ class MyClickup::Prompt
   def process(buf)
     case buf
     when /^context$/
-      puts JSON.pretty_generate @context.to_h
+      @cmd.context
     when /^cd$/
-      cd
+      @cmd.cd
     when /^cd (.*)$/
-      cd(Regexp.last_match(1))
+      @cmd.cd Regexp.last_match 1
     when /^ls$/
-      puts JSON.pretty_generate ls
+      @cmd.ls
     when /^ls (.*)$/
-      puts JSON.pretty_generate ls(Regexp.last_match(1))
+      @cmd.ls Regexp.last_match 1
     when /^exit$/
-      do_exit
+      @cmd.do_exit
     else
       puts "unknown command: #{buf}"
     end
-  end
-
-  def cd(dir = nil)
-    obj = ls.filter { |item| item[:name] == dir }.first
-    @context.change(obj)
-  end
-
-  def ls(dir = nil)
-    case dir || @context.current
-    when "root"
-      @client.teams
-    when "team"
-      @client.spaces(@context.team[:id])
-    when "space"
-      @client.folders(@context.space[:id])
-    when "folder"
-      @client.lists(@context.folder[:id])
-    when "list"
-      @client.tasks(@context.list[:id])
-    else
-      @client.teams
-    end
-  end
-
-  def do_exit
-    puts "bye"
-    exit
   end
 end
